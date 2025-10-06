@@ -106,14 +106,14 @@ function drawButton(i) {
 
   pop();
 }
-
 function drawCursorTriangle() {
   push();
   translate(mouseX, mouseY);
   rotate(-PI / 4); // 45° pointer
   noStroke();
   fill(255, 0, 0, 220);
-  const s = 28; // larger cursor
-  triangle(0, 0, -s / 2, s, s / 2, s);
+  const s = 22; // balanced size (~60% of box)
+  // make pointer narrower for precision
+  triangle(0, 0, -s * 0.35, s, s * 0.35, s);
   pop();
 }
