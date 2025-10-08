@@ -1,4 +1,4 @@
-// Bakeoff 1 — p5.js version with clipped glow & balanced triangle cursor (v3)
+// Bakeoff 1 — p5.js version with INNER glow (no clip/blur) & balanced triangle cursor (v4)
 
 let margin = 200;
 const padding = 50;
@@ -23,21 +23,18 @@ function setup() {
   textSize(16);
   textAlign(CENTER, BASELINE);
 
-  // trial order 0..15, repeated
-  for (let i = 0; i < 16; i++) {
-    for (let k = 0; k < numRepeats; k++) trials.push(i);
-  }
+  for (let i = 0; i < 16; i++) for (let k = 0; k < numRepeats; k++) trials.push(i);
   shuffle(trials, true);
 }
 
 function draw() {
   background(0);
 
-  // version tag
+  // version tag (to verify cache)
   push();
   fill(180);
   textAlign(RIGHT, TOP);
-  text("v3 clipped", width - 12, 10);
+  text("v4 inner", width - 12, 10);
   pop();
 
   if (trialNum >= trials.length) {
@@ -76,10 +73,8 @@ function mousePressed() {
   const target = trials[trialNum];
   const b = getButtonLocation(target);
 
-  if (mouseX > b.x && mouseX < b.x + b.w && mouseY > b.y && mouseY < b.y + b.h)
-    hits++;
-  else
-    misses++;
+  if (mouseX > b.x && mouseX < b.x + b.w && mouseY > b.y && mouseY < b.y + b.h) hits++;
+  else misses++;
 
   trialNum++;
 }
@@ -92,61 +87,6 @@ function getButtonLocation(i) {
   return { x, y, w: buttonSize, h: buttonSize };
 }
 
-// Red/white concentric target + CLIPPED inner glow (no spill)
+// Red/white concentric target + INNER glow (stacked insets, guaranteed inside)
 function drawButton(i) {
-  const b = getButtonLocation(i);
-  push();
-  noStroke();
-
-  // stripes
-  const layers = 5;
-  for (let k = 0; k < layers; k++) {
-    fill(k % 2 === 0 ? color(220, 0, 0) : color(255));
-    const inset = k * (buttonSize / (layers * 2.0));
-    rect(b.x + inset, b.y + inset, b.w - 2 * inset, b.h - 2 * inset);
-  }
-
-  if (trials[trialNum] === i) {
-    const t = frameCount * 0.15;
-    const glowAlpha = map(Math.sin(t), -1, 1, 70, 160);
-    const blur = map(Math.sin(t), -1, 1, 3, 10);
-    const innerSW = map(Math.sin(t), -1, 1, 2, 4);
-
-    // clip to button rect
-    drawingContext.save();
-    drawingContext.beginPath();
-    drawingContext.rect(b.x, b.y, b.w, b.h);
-    drawingContext.clip();
-
-    // soft inner glow
-    drawingContext.shadowColor = `rgba(255,240,0,${glowAlpha/255})`;
-    drawingContext.shadowBlur = blur;
-    noStroke();
-    fill(255, 240, 0, glowAlpha);
-    rect(b.x, b.y, b.w, b.h);
-
-    // inner border (inset)
-    drawingContext.shadowBlur = 0;
-    noFill();
-    stroke(255, 240, 0, 220);
-    strokeWeight(innerSW);
-    const inset = 2;
-    rect(b.x + inset, b.y + inset, b.w - 2 * inset, b.h - 2 * inset);
-
-    drawingContext.restore();
-  }
-
-  pop();
-}
-
-// 45° triangle cursor, balanced for 40px targets
-function drawCursorTriangle() {
-  push();
-  translate(mouseX, mouseY);
-  rotate(-PI / 4);
-  noStroke();
-  fill(255, 0, 0, 220);
-  const s = 22; // ~60% of button height
-  triangle(0, 0, -s * 0.35, s, s * 0.35, s);
-  pop();
-}
+  const
