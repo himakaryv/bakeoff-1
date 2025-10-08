@@ -23,7 +23,6 @@ function setup() {
   textSize(16);
   textAlign(CENTER, BASELINE);
 
-  // Build trials and shuffle
   for (let i = 0; i < 16; i++) for (let k = 0; k < numRepeats; k++) trials.push(i);
   shuffle(trials, true);
 
@@ -40,7 +39,6 @@ function draw() {
   text("v4.1 safe", width - 12, 10);
   pop();
 
-  // If finished, show summary (use toFixed instead of nf)
   if (trialNum >= trials.length) {
     const timeTaken = (finishTime - startTime) / 1000;
     const acc = (hits + misses) > 0 ? (hits * 100.0) / (hits + misses) : 0;
@@ -60,11 +58,9 @@ function draw() {
     return;
   }
 
-  // Trial counter
   fill(255);
   text(`${trialNum + 1} of ${trials.length}`, 40, 20);
 
-  // Draw grid
   for (let i = 0; i < 16; i++) drawButton(i);
 
   drawCursorTriangle();
@@ -106,7 +102,6 @@ function drawButton(i) {
     rect(b.x + inset, b.y + inset, b.w - 2 * inset, b.h - 2 * inset);
   }
 
-  // guard: only access trials[trialNum] if we still have trials left
   if (trialNum < trials.length && trials[trialNum] === i) {
     const t = frameCount * 0.15;
 
